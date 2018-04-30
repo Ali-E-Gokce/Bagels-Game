@@ -1,7 +1,7 @@
 def check_valid(guess,number_length): #checks if user_guess is a valid guess 
     a = len(str((guess)))
     b = len(set((guess)))
-    if guess[0] == 0 or len(guess) != number_length or a != b:
+    if guess[0] == 0 or len(guess) != number_length or a != b: #sees if the number has repeating digits
       return False
     else:
       return True
@@ -21,7 +21,7 @@ def generate(number_length): #generates a number that does not have repeating di
   return (str(first) + second)
 
 
-def bagels_game(): #This isthe game.
+def bagels_game(): #This is the game.
 
   number_length=int(input("How long do you want the number to be?"))
   number = generate(number_length) 
