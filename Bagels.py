@@ -44,8 +44,10 @@ def check_bagels(comp,user):
 
 def bagels_game():
   number_length=input("How long do you want the number to be?")
+  while int(number_length)>9:
+    number_length= input("The number can't be more than 9 digits long. How long do you want the number to be?")
   comp = generate(number_length) 
-  print (comp)
+  #print (comp) you can toggle this on and off to see what number the computer guesses, to either test the game or to gain a better understadning of the rules.
   number_of_guesses = 0
   user = (input("What number do you want to guess?"))
   while check_valid(user,number_length) == False:
