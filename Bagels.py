@@ -1,87 +1,99 @@
-def check_valid(guess,number_length): #checks if user_guess is a valid guess, number can start with o and the guess has to be of the same length as the number. Returns initial guess if guess fits in the rules
+import random
 
-    while True:
-      a = len(str((guess)))
-      b = len(set((guess)))
-    
-      if int(guess[0]) == 0 or len(guess) != int(number_length) or a!=b:#the last condition checks if there are repeating numbers:
-        guess=input("What number do you want to guess? The leading digit can't be zero, it needs to be"+ " " + str(number_length) +" digits" + "long and there can be no repeating digits")
-        continue
-      else:
-        break
-    
+def is_int(num):
+    try:
+        int(num)
+    except:
+        return False
+    return True
+
+#checks if user_guess is a valid guess, number can start with 0
+#Returns initial guess if guess is legal
+def get_valid_guess(num_length):
+    guess =  input("What number do you want to guess?" +
+                      " The leading digit can't be zero, it needs to be" + " " +
+        str(num_length) + " digits" + " long and can't have repeating digits\n")
+    guess_length = len(str(guess))
+    #making it a set will show how many unique digits there are
+    guess_digits = len(set(guess))
+    first_digit =  int(guess[0])
+    if not is_int(guess) or  first_digit == 0 or\
+    len(guess) != int(num_length) or guess_length != guess_digits:
+        #the last condition checks if there are repeating numbers
+        return get_valid_guess(num_length)
     return guess
 
-    
-def play_again(): #asks the player if they want to play agian
-  again=input("Do you want to play again? Type \"yes\" if you do. Type anything else to exit.")
+#asks the player if they want to play agian
+def play_again():
+  again=input("Do you want to play again? Type \"yes\" if you do.\
+                                     Type anything else to exit.")
   if again.lower()=="yes":
     bagels_game()
   else:
     print ("Good game! See you again!")
-      
-def generate(number_length): #generates random number that fits bagel rules
-  import random
-  first = random.randint(1,9) #the first digit can't be zero, but the rest can
-  second_list = random.sample((set(range(1,10)))-{first},number_length-1) #to make sure the other two numbers are not the same as the first
 
-  
-  
+#generates random number that fits bagel rules
+def generate_num(num_length):
+  #the first digit can't be zero, but the rest can
+  first_digit = random.randint(1,9)
+  #to make sure the other two numbers are not the same as the first
+  available_nums = set(range(1,10))-{first_digit}
+  rest_of_digits = random.sample(available_nums, num_length-1)
+  rest_of_digits_str = "".join(str(x) for x in (rest_of_digits))
+  num = str(first_digit) + rest_of_digits_str
+  return num
 
-  second = "".join(str(x) for x in (second_list))
-  return (str(first) + second) #this is inefficient because it does a few unecessary type conversions, but since the number will always be very small, I will leave it like this for readability. If you want to increase performance marginally you can convert from the list straight to an integer using simple algebra and a for loop.
+def get_valid_num_length():
+    num_length=input("How long do you want the number to be?")
+    if not is_int(num_length) or int(num_length)<1 or int(num_length)>9:
+        return get_valid_num_length()
+    return int(num_length)
 
-  
+def play_bagels():
+  num_length = get_valid_num_length()
+  num = generate_num(num_length)
+  user_guess = get_valid_guess(num_length)
 
+  num_of_guesses = 1
 
-def bagels_game():
-
-  number_length=input("How long do you want the number to be?")
-
-  number = generate(int(number_length)) #the conversion is done outside of the input for backwards compatibality with raw_input
-
-  user_guess = input("What number do you want to guess?")
-
-
-  user_guess=check_valid(user_guess,number_length)
-    
-    
-  number_of_guesses = 1
-
-  while int(user_guess) != int(number):
-
+  while int(user_guess) != int(num):
     pico=False
     fermi=False
-
     #checks if any of the numbers are in the right place
-    for i in range (len(number)):
-     if user_guess[i] == number[i]:
+    for i in range (len(num)):
+     if user_guess[i] == num[i]:
       print ("Fermi!")
       fermi=True
-
-
     #checks if number is correct, but in the wrong index
-    position=0
-    for i in user_guess: 
-      if i in number and user_guess[position] != number[position]:
+    pos=0
+    for i in user_guess:
+      if i in num and user_guess[pos] != num[pos]:
         print("Pico!")
         pico=True
-      position += 1
+      pos += 1
 
-    
-    if not (pico or fermi): #if neither of them has been printed before
+    #if neither of them has been printed before
+    if not (pico or fermi):
       print("Bagel!")
 
-    number_of_guesses += 1
-    user_guess = input("What number do you want to guess?")
-    user_guess=check_valid(user_guess,number_length)
-    
-  if number_of_guesses == 1:
+    num_of_guesses += 1
+    user_guess = get_valid_guess(num_length)
+
+  if num_of_guesses == 1:
     print ("congrat you got in on the first try")
   else:
-   print ("the guess was", number, "you got it in", number_of_guesses, "tries!!!")
-  play_again() #this could technically be an issue if the user plays more times than the recursion limit of their system. For readability I will leave it like this, but if it is an issue, you can make a while-loop in the play_again function, similiar to the check_valid function and call it manually after the bagels_game() call that starts the game.
-  
+   print ("the guess was", num, "you got it in", num_of_guesses, "tries!")
 
-#uncomment following line to play:
-#bagels_game()
+  play_again()
+
+def play_again():
+  while True:
+    again=input("Do you want to play again? Type \"yes\" if you do. Type anything else to exit.")
+    if again.lower()=="yes":
+      play_bagels()
+      continue
+    else:
+      print ("Good game! See you again!")
+      break
+
+play_bagels()
